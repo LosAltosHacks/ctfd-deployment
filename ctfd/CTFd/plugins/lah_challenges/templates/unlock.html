@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block stylesheets %}
+	<link rel="stylesheet" href="{{ url_for('views.themes', theme='admin', path='css/challenge-board.css') }}">
+{% endblock %}
+
+{% block content %}
+
+<div class="jumbotron">
+    <div class="container">
+        <h1 class="text-center">Unlock a challenge</h1>
+        <h2 class="text-center">Waiting for {{ waiting }}.</h2>
+        {% if countdown_end %}
+        <h2 class="text-center" id="timer">&nbsp;</h2>
+        {% endif %}
+    </div>
+</div>
+<div class="container">
+    {% if unlocker_id == user_id %}
+    <div class="row">
+        <div class="col-md-6 col-md-offset-3">
+            <h2 class="text-center">It's your turn. The clock is ticking.</h2>
+            <form id="unlock-lah-form" method="post" action="#">
+                <div class="form-group">
+                    <select class="form-control" name="unlock">
+                        <option value=""> -- </option>
+                        {% for challenge_id in challenges %}
+                            <option value="{{ challenge_id }}">{{ challenges[challenge_id] }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <input type="submit" class="btn btn-success float-right" value="Unlock">
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {% endif %}
+    <a href="{{ url_for('lah_challenges.unlock_reset') }}">
+        <small class="text-muted">Admin unlock override.</small>
+    </a>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+    {% if countdown_end %}
+    <script>
+        var timerElem = $("#timer")
+        var until = new Date({{ countdown_end | tojson }} * 1000)
+        setInterval(function() {
+            now = Date.now()
+            timerElem.text(Math.max(Math.round((until - now) / 1000), 0))
+        }, 1000)
+    </script>
+    {% endif %}
+	<script src="{{ url_for('views.themes', theme='core', path='js/hints.js') }}"></script>
+	<script src="{{ request.script_root }}{{ update_script }}"></script>
+{% endblock %}
