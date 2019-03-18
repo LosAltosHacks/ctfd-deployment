@@ -1,0 +1,3 @@
+# configure ssh access for your environment in .ssh/config
+[docker-dump]
+lahctf

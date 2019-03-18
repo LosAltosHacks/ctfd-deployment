@@ -1,0 +1,5 @@
+- name: "Installing packages"
+  apt:
+    pkg: ['vim', 'nano', 'git', 'docker']
+    state: present
+    update_cache: yes
