@@ -173,7 +173,7 @@ class LahChallengeClass(BaseChallenge):
             raise RuntimeError("Attempted to solve a locked lah challenge.")
 
         # check if this is the selected solve
-        unlock = UnlockState.query.one()
+        unlock = get_unlock_state()
         if unlock.selected == challenge.id:
             with db.session.no_autoflush:
                 unlock.selected = None
@@ -311,6 +311,14 @@ class UnlockState(db.Model):
         db.CheckConstraint('(expiration IS NULL) = (unlocker_id IS NULL)'),
     )
 
+def get_unlock_state():
+    unlock = UnlockState.query.one_or_none()
+    if unlock:
+        return unlock
+    db.session.add(UnlockState(id=1))
+    db.session.commit()
+    return get_unlock_state()
+
 def unlock_timeout_callback():
     with APP_REF.app_context():
         count = db.session.query(LahChallenge).filter(
@@ -326,7 +334,7 @@ def unlock_timeout_callback():
             log('lah', "[{date}] encountered invalid state during manual unlock timeout: randomly selected challenge was None.")
             return
         challenge.is_unlocked = True
-        unlock = UnlockState.query.one()
+        unlock = get_unlock_state()
         with db.session.no_autoflush:
             unlock.unlocker_id = None
             unlock.expiration = None
@@ -343,7 +351,7 @@ lah_print = Blueprint('lah_challenges', __name__, template_folder='templates', s
 @authed_only
 def lah_unlock():
     if request.method == 'POST':
-        unlock = UnlockState.query.one()
+        unlock = get_unlock_state()
         if get_current_user().id != unlock.unlocker_id:
             abort(403)
         challenge = LahChallenge.query.filter_by(id=request.form['unlock']).one_or_none()
@@ -360,7 +368,7 @@ def lah_unlock():
             pass
         return redirect(url_for('challenges.listing'))
     unlockables = dict(LahChallenge.query.filter_by(is_unlocked=False, state="visible").with_entities(LahChallenge.id, LahChallenge.name).all())
-    unlock = UnlockState.query.one()
+    unlock = get_unlock_state()
     if unlock.unlocker_id:
         waiting = "user '" + db.session.query(Users.name).filter(Users.id==unlock.unlocker_id).scalar() + "'"
     else:
@@ -382,7 +390,7 @@ def lah_unlock():
 @admins_only
 @authed_only
 def unlock_reset():
-    unlock = UnlockState.query.one()
+    unlock = get_unlock_state()
     with db.session.no_autoflush:
         unlock.selected = None
         unlock.unlocker_id = get_current_user().id
@@ -419,7 +427,7 @@ class LahChallengeInfo(Resource):
         for challenge in challenges:
             response['unlocked'][challenge.id] = challenge.is_unlocked
 
-        unlock = UnlockState.query.one()
+        unlock = get_unlock_state()
         response['selected'] = unlock.selected
         db.session.close()
         return {
@@ -439,12 +447,6 @@ def load(app):
     APP_REF = app
     scheduler.start()
     atexit.register(lambda: scheduler.shutdown())
-
-    # Insert data if it doesnt already exist
-    with app.app_context():
-        if UnlockState.query.count() <= 0:
-            db.session.add(UnlockState(id=1))
-            db.session.commit()
 
     app.register_blueprint(lah_print)
     register_user_page_menu_bar("Unlocking", "/unlock")
