@@ -1,6 +1,17 @@
-FROM python:2.7-alpine
+FROM python:3.6-alpine
 RUN apk update && \
-    apk add python python-dev linux-headers libffi-dev gcc make musl-dev py-pip mysql-client git openssl-dev
+    apk add python python-dev linux-headers libffi-dev gcc make musl-dev py-pip git openssl-dev
+
+# for psycopg2
+RUN apk update && apk add postgresql-dev gcc python-dev musl-dev
+
+RUN apk update && apk add postgresql-client
+
+# for timezones
+RUN apk update && apk add tzdata
+ENV TZ=UTC
+RUN cp /usr/share/zoneinfo/Etc/UTC /etc/localtime
+RUN apk del tzdata
 
 WORKDIR /opt/CTFd
 RUN mkdir -p /opt/CTFd
