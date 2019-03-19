@@ -23,7 +23,7 @@ if [ -n "$DATABASE_URL" ]
     database=`echo $url | awk -F[:] '{print $1}'`
     port=`echo $url | awk -F[:] '{print $2}'`
     echo "Waiting for $database:$port to be ready"
-    while ! mysqladmin ping -h "$database" -P "$port" --silent; do
+    while ! pg_isready -h "$database" -p "$port" --quiet; do
         # Show some progress
         echo -n '.';
         sleep 1;
