@@ -1,23 +1,32 @@
-- name: "Launch postgres container"
+- name: "docker | Launch postgres container"
   docker_container:
-    name: db
+    name: pgdb
     image: postgres:11.2
     ports:
       - '5432:5432'
-    # TODO check
-    # volumes:
-    #   - /private/var/lib/postgresql:/var/lib/postgresql
-
-
-
-- name: Launch nginx container
-  docker_container:
-    name: nginx
-    image:  nginx:1.15
-    ports:
-      - '80:80'
-      - '443:443'
-    # links:
-    #   - web
+    env:
+      POSTGRES_USER: ctfd
+      POSTGRES_PASSWORD: "{{ postgres_db_password }}"
     volumes:
-      -  ./data/nginx:/etc/nginx/conf.d
+      - /var/lib/postgresql
+
+- name: docker | Build web container image
+  docker_image:
+    path: ../ctfd
+    name: web
+    force: "{{ docker_force }}"
+
+- name: docker | Start web container
+  docker_container:
+    name: web
+    image: web
+    ports:
+      - '8000:8000'
+    env:
+      DATABASE_URL: 'postgresql+psycopg2://ctfd:{{ postgres_db_password }}@pgdb:5432/ctfd'
+      VIRTUAL_HOST: '{{ ctf_virtual_host }}'
+    volumes:
+      - '{{ ctf_log_dir }}:/opt/CTFd/logs'
+    links:
+      - pgdb
+      - nginx

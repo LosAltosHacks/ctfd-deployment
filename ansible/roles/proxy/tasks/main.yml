@@ -1,0 +1,11 @@
+- name: docker | Launch nginx proxy
+  docker_container:
+    name: nginx
+    image: jwilder/nginx-proxy:alpine
+    ports:
+      - '80:80'
+      - '443:443'
+    volumes:
+      - "/var/run/docker.sock:/tmp/docker.sock:ro"
+    links:
+      - web

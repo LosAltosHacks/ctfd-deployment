@@ -1,0 +1,9 @@
+# Add ctfd.local to hosts file
+ctf_virtual_host: ctfd.local
+ctf_log_dir: ./logs
+
+postgres_db_location: ./files/pg
+
+nginx_do_ssl: false
+
+docker_force: yes

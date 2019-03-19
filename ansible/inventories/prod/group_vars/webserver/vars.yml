@@ -1,0 +1,4 @@
+postgres_db_location:
+
+nginx_do_ssl: false
+nginx_config_path: /etc/nginx/conf.d/
