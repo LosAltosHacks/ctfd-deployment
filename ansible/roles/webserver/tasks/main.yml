@@ -9,6 +9,8 @@
       POSTGRES_PASSWORD: "{{ postgres_db_password }}"
     volumes:
       - /var/lib/postgresql
+    networks:
+      - name: ctfdnet
 
 - name: docker | Build web container image
   docker_image:
@@ -27,6 +29,5 @@
       VIRTUAL_HOST: '{{ ctf_virtual_host }}'
     volumes:
       - '{{ ctf_log_dir }}:/opt/CTFd/logs'
-    links:
-      - pgdb
-      - nginx
+    networks:
+      - name: ctfdnet

@@ -1,4 +1,6 @@
 # Add ctfd.local to hosts file
+is_prod: false
+
 ctf_virtual_host: ctfd.local
 ctf_log_dir: ./logs
 
