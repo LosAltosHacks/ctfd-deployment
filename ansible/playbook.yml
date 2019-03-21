@@ -1,6 +1,5 @@
 ---
-- hosts: all
-  connection: local
+- hosts: webserver
   become: true
   roles:
   - basic

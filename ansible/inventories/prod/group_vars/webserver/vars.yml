@@ -1,4 +1,5 @@
 is_prod: true
 ctf_virtual_host: ctf.losaltoshacks.com
 ctf_log_dir: /var/log/ctfd
-docker_force: false
+ctf_docker_build_path: /opt/ctfd
+docker_force: true

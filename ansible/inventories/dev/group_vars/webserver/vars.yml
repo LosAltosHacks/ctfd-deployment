@@ -1,4 +1,5 @@
 is_prod: false
 ctf_virtual_host: ctfd.local
 ctf_log_dir: ./logs
+ctf_docker_build_path: ../ctfd
 docker_force: yes

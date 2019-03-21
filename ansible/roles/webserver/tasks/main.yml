@@ -1,3 +1,26 @@
+- name: "apt | Install docker driver"
+  apt:
+    pkg: ['python', 'python-docker']
+    state: present
+
+- name: "apt | Install rsync"
+  apt:
+    pkg: 'rsync'
+    state: present
+  when: is_prod
+
+- name: "synchronize | ctfd files"
+  synchronize:
+    src: ../ctfd/
+    dest: /opt/ctfd
+    archive: false
+    checksum: true
+    delete: true
+    compress: true
+    recursive: true
+    perms: true
+  when: is_prod
+
 - name: docker | Create network
   docker_network:
     name: ctfdnet
@@ -18,7 +41,7 @@
 
 - name: docker | Build web container image
   docker_image:
-    path: ../ctfd
+    path: '{{ ctf_docker_build_path }}'
     name: web
     force: "{{ docker_force }}"
 
