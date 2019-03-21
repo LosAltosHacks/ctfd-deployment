@@ -1,4 +1,4 @@
-postgres_db_location:
-
-nginx_do_ssl: false
-nginx_config_path: /etc/nginx/conf.d/
+is_prod: true
+ctf_virtual_host: ctf.losaltoshacks.com
+ctf_log_dir: /var/log/ctfd
+docker_force: false

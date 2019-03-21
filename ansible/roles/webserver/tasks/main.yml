@@ -27,6 +27,7 @@
     env:
       DATABASE_URL: 'postgresql+psycopg2://ctfd:{{ postgres_db_password }}@pgdb:5432/ctfd'
       VIRTUAL_HOST: '{{ ctf_virtual_host }}'
+      SECRET_KEY: '{{ ctf_secret_key }}'
     volumes:
       - '{{ ctf_log_dir }}:/opt/CTFd/logs'
     networks:
